@@ -27,7 +27,7 @@ _++_ : forall {m n X} -> Vec X m -> Vec X n -> Vec X (m +N n)
 (x , xs) ++ ys  = x , xs ++ ys
 
 _++'_ : forall {m n X} -> Vec X m -> Vec X n -> Vec X (m +N' n)
-xs ++' ys = {!!}
+_++'_ {m} {n} xs ys = {!!}
 
 
 {- 1.3 Chop a vector in two. Note how "with" lets us grab more information
