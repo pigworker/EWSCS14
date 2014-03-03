@@ -81,7 +81,7 @@ vmap' = vtrav {!!} {!!} {!!}
 
 {- 1.7 vector total -}
 
-vtotal : forall {n S T} -> Vec Nat n -> Nat
+vtotal : forall {n} -> Vec Nat n -> Nat
 vtotal = vtrav {!!} {!!} {!!} {!!}
 
 
