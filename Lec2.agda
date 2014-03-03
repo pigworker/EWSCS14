@@ -13,7 +13,7 @@ Le (su x) (su y) = Le x y
 record Prf (P : Set) : Set where
   constructor !
   field
-    {{prf}} : P
+    {{.prf}} : P
 
 pattern lte = inl !
 pattern gte = inr !
@@ -48,17 +48,13 @@ pattern iv x = x , ! , !
 insert : forall {l u} -> IntV l u -> BST l u -> BST l u
 insert (iv x) leaf = node leaf x leaf
 insert (iv x) (node l y r) with le x y
+insert (iv x) (node l y r) | lte = node (insert (iv x) l) y r
+insert (iv x) (node l y r) | gte = node l y (insert (iv x) r)
+
+{- with le x y
 insert (x , ! , !) (pnode y l r) | lte
   = node (insert (x , ! , !) l) y r
 insert (x , ! , !) (pnode y l r) | gte
   = node l y (insert (x , ! , !) r)
-
-
-
-
-
-{-
- with le x y
-insert (iv x) (node l y r) | lte = node (insert (iv x) l) y r
-insert (iv x) (node l y r) | gte = node l y (insert (iv x) r)
 -}
+

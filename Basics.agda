@@ -1,6 +1,5 @@
 module Basics where
 
-{-
 postulate
   Level  : Set
   lze    : Level
@@ -11,7 +10,6 @@ postulate
 {-# BUILTIN LEVELZERO     lze    #-}
 {-# BUILTIN LEVELSUC      lsu    #-}
 {-# BUILTIN LEVELMAX      lmax   #-}
--}
 
 id : forall {i}{X : Set i} -> X -> X
 id x = x
@@ -52,8 +50,8 @@ data Nat : Set where
   su : Nat -> Nat
 
 {-# BUILTIN NATURAL Nat #-}
---{-# BUILTIN ZERO ze #-}
---{-# BUILTIN SUC su #-}
+{-# BUILTIN ZERO ze #-}
+{-# BUILTIN SUC su #-}
 
 data Vec (X : Set) : Nat -> Set where
   [] : Vec X ze
