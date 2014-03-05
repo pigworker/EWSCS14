@@ -3,14 +3,14 @@ module UPolyBasics where
 
 postulate
       Level : Set
-      lzero  : Level
-      lsuc   : Level -> Level
+      lze  : Level
+      lsu   : Level -> Level
       lmax   : Level -> Level -> Level
 
 {-# BUILTIN LEVEL     Level #-}
-{-# BUILTIN LEVELZERO lzero  #-}
-{-# BUILTIN LEVELSUC  lsuc   #-}
-{-# BUILTIN LEVELMAX  lmax   #-}
+{-# BUILTIN LEVELZERO lze   #-}
+{-# BUILTIN LEVELSUC  lsu   #-}
+{-# BUILTIN LEVELMAX  lmax  #-}
 
 _o_ : forall {i j k}
         {A : Set i}{B : A -> Set j}{C : (a : A) -> B a -> Set k} ->
@@ -92,7 +92,7 @@ data Nat : Set where
 {-# BUILTIN ZERO ze #-}
 {-# BUILTIN SUC su #-}
 
-record Cum {l}(X : Set l) : Set (lsuc l) where
+record Cum {l}(X : Set l) : Set (lsu l) where
   constructor up
   field
     down : X

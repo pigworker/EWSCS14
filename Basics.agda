@@ -45,6 +45,24 @@ data _==_ {l}{X : Set l}(x : X) : X -> Set l where
 {-# BUILTIN REFL refl #-}
 infix 1 _==_
 
+cong : forall {k l}{S : Set k}{T : Set l}(f : S -> T){s s' : S} ->
+       s == s' -> f s == f s'
+cong f refl = refl
+
+_=!!_>>_ : forall {l}{X : Set l}(x : X){y z} -> x == y -> y == z -> x == z
+_ =!! refl >> q = q
+
+_<<_!!=_ : forall {l}{X : Set l}(x : X){y z} -> y == x -> y == z -> x == z
+_ << refl !!= q = q
+
+_<QED> : forall {l}{X : Set l}(x : X) -> x == x
+x <QED> = refl
+
+infixr 1 _=!!_>>_ _<<_!!=_ _<QED>
+
+trans : forall {l}{X : Set l}{x y z : X} -> x == y -> y == z -> x == z
+trans refl q = q
+
 data Nat : Set where
   ze : Nat
   su : Nat -> Nat

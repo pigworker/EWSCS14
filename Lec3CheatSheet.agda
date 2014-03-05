@@ -85,11 +85,6 @@ gulp {X} F = go F id where
 
 mygulp = gulp (`X `* `X `* `X) (1 , 2 , 3)
 
-record Prf (P : Set) : Set where
-  constructor !
-  field
-    {{.prf}} : P
-
 data Desc (I : Set) : Set1 where
   `X : I -> Desc I
   `Sg : (S : Set)(T : S -> Desc I) -> Desc I
