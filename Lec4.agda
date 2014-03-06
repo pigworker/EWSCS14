@@ -2,7 +2,7 @@ module Lec4 where
 
 open import Basics
 
-module Binding -- (E : Set) -- uncomment when introducing variables
+module Binding (E : Set) -- uncomment when introducing variables
   where
 
   {- The plan is to revisit Tuesday's construction of a "universe"
@@ -15,24 +15,7 @@ module Binding -- (E : Set) -- uncomment when introducing variables
      structure, so we'll need to make sure that we can define a
      generic substitution operator. -}  -- C-s plum
 
-  -- S
-  -- P
-  -- O
-  -- I
-  -- L
-  -- E
-  -- R
-  -- S
-  -- !
-
-
-
-
-
-
-
-
-  {- uncomment when introducing variables
+  {- uncomment when introducing variables -}
   data Cxt : Set where
     C0 : Cxt
     _:<_ : Cxt -> E -> Cxt
@@ -41,9 +24,9 @@ module Binding -- (E : Set) -- uncomment when introducing variables
   data Var (V : E -> Set) : Cxt -> Set where
     top : forall {G e} -> V e -> Var V (G :< e)
     pop : forall {G e} -> Var V G -> Var V (G :< e)
-  -}
+  {--}
 
-  {- uncomment in case of an emergency
+  {- uncomment in case of an emergency -}
   data Ext : Set where
     E0 : Ext
     _:>_ : E -> Ext -> Ext
@@ -52,7 +35,7 @@ module Binding -- (E : Set) -- uncomment when introducing variables
   _<><_ : Cxt -> Ext -> Cxt
   G <>< E0 = G
   G <>< (e :> E) = (G :< e) <>< E
-  -}
+  {--}
 
   module Describing (I : Set) where  -- I is the set of permitted "sorts"
 
@@ -64,48 +47,53 @@ module Binding -- (E : Set) -- uncomment when introducing variables
       `Sg    : (S : Set)(T : S -> Desc) -> Desc
       `0 `1  : Desc
       _`*_   : (S T : Desc) -> Desc
-      -- and one more...
+      _`=>_  : E -> Desc -> Desc
 
-    Node : Desc -> (I ->                                       -- Cxt ->
-                         Set) ->                               -- Cxt ->
+    Node : Desc -> (I -> Cxt ->
+                         Set) -> Cxt ->
                    Set                                  -- for C-s plum
-    Node (`X i)      X  = X i
-    Node (`Sg S T)   X  = Sg S \ s -> Node (T s) X
-    Node `0          X  = Zero
-    Node `1          X  = One
-    Node (S `* T)    X  = Node S X * Node T X
-    -- and one more...
+    Node (`X i)      X  G = X i G
+    Node (`Sg S T)   X  G = Sg S \ s -> Node (T s) X G
+    Node `0          X  G = Zero
+    Node `1          X  G = One
+    Node (S `* T)    X  G = Node S X G * Node T X G
+    Node (e `=> T)   X  G = Node T X (G :< e)
 
     module Syntax
-                                                     -- (V : I -> E -> Set)
+             (V : I -> E -> Set)
              (F : I -> Desc)
              where
 
-      data Term (i : I)                                      -- (G : Cxt)
+      data Term (i : I)(G : Cxt)
                        : Set where -- I called this "Data" on Tuesday
-        -- and one more
-        <_> : Node (F i) Term  -> Term i
+        var : Var (V i) G -> Term i G -- and one more
+        <_> : Node (F i) Term G -> Term i G
 
       -- visit the examples are at the end of the file (C-s banana)
 
 
-      {- uncomment once we have contexts and variables
-      Sub : Cxt -> Cxt -> Set
-      Sub G D = forall {i} -> Var (V i) G -> Term i D
+      {- uncomment once we have contexts and variables -}
+      Shub : Cxt -> Cxt -> Set
+      Shub G D = forall X {i} -> Var (V i) (G <>< X) -> Term i (D <>< X)
 
       Act : Cxt -> Cxt -> Set
       Act G D = forall {i} -> Term i G -> Term i D
 
-      sub : forall {G D} -> Sub G D -> Act G D
-      subNode : forall {G D} -> Sub G D -> (N : Desc) ->
+      shub : forall {G D} -> Shub G D -> Act G D
+      shubNode : forall {G D} -> Shub G D -> (N : Desc) ->
          Node N Term G -> Node N Term D
 
-      sub f (var x) = f x
-      sub f {i} < t > = < subNode f (F i) t >
-      subNode f N t = {!!}
-      -}
+      shub f (var x) = f E0 x
+      shub f {i} < t > = < shubNode f (F i) t >
+      shubNode f (`X i) t = shub f t
+      shubNode f (`Sg S T) (s , t) = s , shubNode f (T s) t
+      shubNode f `0 ()
+      shubNode f `1 <> = <>
+      shubNode f (S `* T) (s , t) = shubNode f S s , shubNode f T t
+      shubNode f (e `=> T) t = shubNode (f o _:>_ e) T t
+      {--}
 
-      {- uncomment once we're shifty
+      {- uncomment once we're shifty -}
       record Kit (K : I -> Cxt -> Set) : Set where
         constructor kit
         field
@@ -115,19 +103,21 @@ module Binding -- (E : Set) -- uncomment when introducing variables
         FunK : Cxt -> Cxt -> Set
         FunK G D = forall {i} ->  Var (V i) G -> K i D
         weak : forall {e G D} -> FunK G D -> FunK (G :< e) (D :< e)
-        weak f x = ?
+        weak f (top x) = kVa (top x)
+        weak f (pop x) = kWk (f x)
         kitSh : forall {G D} -> FunK G D -> Shub G D
-        kitSh f X = ?
+        kitSh f E0 = kTm o f
+        kitSh f (e :> X) = kitSh (weak f) X
         act : forall {G D} -> FunK G D -> Act G D
         act = shub o kitSh
       open Kit public
 
       REN : Kit \ i G -> Var (V i) G
-      REN = ?
+      REN = kit id var pop
 
-      SUB : Kit TERM
-      SUB = ?
-      -}
+      SUB : Kit Term
+      SUB = kit var id (act REN pop)
+      {--}
 
     open Syntax public
 
@@ -140,26 +130,36 @@ NoV i ()
 
 
 
-
 data NatE : Set where ze su : NatE  -- an enumeration, for readability
-NatD : One -> Desc One
-NatD <> = {!!}
+NatD : One -> Desc Zero One
+NatD <> = `Sg NatE (\
+  { ze -> `1
+  ; su -> `X <>
+  })
 
 NAT : Set
-NAT = Term One NatD <>
+NAT = Term Zero One NoV NatD <> C0
 
 -- rebuild the constructors
+ZE : NAT
+ZE = < ze , <> >
 
-VecD : Set -> NAT -> Desc NAT
-VecD A n  = {!!}
+SU : NAT -> NAT
+SU n = < su , n >
+
+VecD : Set -> NAT -> Desc Zero NAT
+VecD A (var ())
+VecD A < ze , <> > = `1
+VecD A < su , n > = `Sg A \ _ -> `X n
 
 VEC : Set -> NAT -> Set
-VEC A n = Term NAT (VecD A) n                            -- for C-s banana
+VEC A n = Term Zero NAT NoV (VecD A) n C0                           -- for C-s banana
 
--- example : VEC NatE < su , < su , < su , < ze , <> > > > >
+--example : VEC NatE < su , < su , < su , < ze , <> > > > >
+--example = {!-l!}
 
 data TyE : Set where nat arrow : TyE
-TyD : One -> Desc One
+TyD : One -> Desc Zero One
 TyD <> = `Sg TyE \
   {  nat    -> `1
   ;  arrow  -> `X <> `* `X <>
@@ -168,13 +168,13 @@ pattern _>>_ s t = < arrow , s , t >
 infixr 4 _>>_
 
 TY : Set
-TY = Term One TyD <>
+TY = Term Zero One NoV TyD <> C0
 
 -- Now, let's have variables. Go back to the top.
 
 data LamC : Set where app lam : LamC
 
-{- uncomment once we have variables
+{- uncomment once we have variables -}
 ULamD : One  -> Desc One One
 ULamD <> = `Sg LamC \
   {  app  -> `X <> `* `X <>
@@ -184,19 +184,26 @@ ULamD <> = `Sg LamC \
 ULam : Cxt One -> Set
 ULam = Term One One (\ _ _ -> One) ULamD <>
 
-myTerm : forall {G} -> ULam G
-myTerm = ?
--}
+--myTerm : forall {G} -> ULam G
+--myTerm = {!-l!}
+{--}
 
-{- uncomment once we have variables
-TLamD : Ty -> Desc Ty Ty
+{- uncomment once we have variables -}
+TLamD : TY -> Desc TY TY
 TLamD t = `Sg LamC \
-  {  lam -> ?
-  ;  app -> ?
-  }  -- where
+  {  app -> `Sg TY \ s -> `X (s >> t) `* `X s
+  ;  lam -> lambody t
+  }  where
+  lambody : TY -> Desc TY TY
+  lambody (var ())
+  lambody < nat , <> > = `0
+  lambody (s >> t) = s `=> `X t
 
-_!-_ : Cxt Ty -> Ty -> Set
-G !- t = Term Ty Ty _==_ TLamD t G
+_!-_ : Cxt TY -> TY -> Set
+G !- t = Term TY TY _==_ TLamD t G
 infixr 2 _!-_
 
--}
+{--}
+
+example : forall {t} -> C0 !- t >> t
+example = < lam , var (top refl) >
