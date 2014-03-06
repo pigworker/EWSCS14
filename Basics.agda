@@ -20,6 +20,7 @@ _o_ :  forall {i j k}
        (g : (a : A) -> B a)
        (a : A) -> C a (g a)
 (f o g) a = f (g a)
+infixr 5 _o_
 
 data Zero : Set where
 
