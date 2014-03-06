@@ -18,10 +18,6 @@ module Binding (E : Set) where
   G <>< E0 = G
   G <>< (e :> E) = (G :< e) <>< E
 
-  _++_ : Ext -> Ext -> Ext
-  E0 ++ Y = Y
-  (e :> X) ++ Y = e :> (X ++ Y)
-
   data Var (V : E -> Set) : Cxt -> Set where
     top : forall {G e} -> V e -> Var V (G :< e)
     pop : forall {G e} -> Var V G -> Var V (G :< e)
@@ -124,7 +120,7 @@ module Binding (E : Set) where
         coNodeLaw dh gd (N `* N') (n , n')
           rewrite coNodeLaw dh gd N n | coNodeLaw dh gd N' n' = refl
         coNodeLaw dh gd (e `=> N) t = coNodeLaw (dh o _:>_ e) (gd o _:>_ e) N t
-
+      
       record Kit (K : I -> Cxt -> Set) : Set where
         constructor kit
         field
